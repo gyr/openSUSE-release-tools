@@ -4,7 +4,7 @@ include Makefile.common
 
 pkgdata_BINS = $(shell find * -maxdepth 0 -executable -type f)
 pkgdata_SCRIPTS=$(wildcard *.py *.pl *.sh)
-pkgdata_SCRIPTS+=bs_mirrorfull findfileconflicts verify-build-and-generatelists gocd/verify-repo-built-successful.py
+pkgdata_SCRIPTS+=bs_mirrorfull findfileconflicts generate-release-packages verify-build-and-generatelists gocd/verify-repo-built-successful.py
 pkgdata_DATA+=bs_copy metrics osclib pkglistgen $(wildcard *.pm *.testcase)
 VERSION = "build-$(shell date +%F)"
 
