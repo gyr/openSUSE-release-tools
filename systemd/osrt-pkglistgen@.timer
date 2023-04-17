@@ -1,6 +1,6 @@
 [Timer]
 OnBootSec=420
-OnCalendar=*:05,15,25,35,45,55
+OnCalendar=*:0,10,20,30,40,50
 Unit=osrt-pkglistgen@.service
 
 [Install]

@@ -10,7 +10,7 @@ logger() {
 }
 
 polling_repo() {
-    logger "[CHECKING] Checking standard repository from ${PROJECT}"
+    logger "[CHECKING] Standard repository from ${PROJECT}"
     OUTPUT=$(timeout 3m /usr/share/openSUSE-release-tools/verify-repo-built-successful.py -A ${API_URL} -p ${PROJECT} -r standard 2>&1)
     RETURNCODE=$?
     if [ ${RETURNCODE} -eq 0 ]; then
@@ -37,7 +37,17 @@ polling_repo() {
     return ${RETURNCODE}
 }
 
-logger "[START] Start osrt-pkglistgen@${PROJECT}.service: polling repository results"
+logger "[START] osrt-pkglistgen@${PROJECT}.service"
+
+logger "[RUNNING] osrt-pkglistgen: 000release-packages"
+timeout 1.5h /usr/bin/osrt-pkglistgen -A ${API_URL} --debug update_and_solve -p ${PROJECT} -s target --only-release-packages --custom-cache-tag releasepackages --force >> ${LOG_DIR}/pkglistgen.log 2>&1
+if [ $? -eq 124 ]; then
+    logger "[TIMEOUT] osrt-pkglistgen: 000release-packages"
+    logger "[FINISH] osrt-pkglistgen@${PROJECT}.service"
+    exit 1
+fi
+
+logger "[POOLING] repository results"
 polling_repo
 # Check if repository building
 if [ $? -eq 3 ]; then
@@ -48,16 +58,13 @@ if [ $? -eq 3 ]; then
         polling_repo
         case $? in
             0)
-                # Stop polling repository results: Repository finished building
-                if systemctl is-active --quiet osrt-relpkggen@${PROJECT}.service; then
-                    logger "[WARNING] osrt-relpkggen@${PROJECT}.service is running"
-                    logger "[WAITING] Waiting for osrt-relpkggen@${PROJECT}.service finishes"
-                    continue
-                else
-                    logger"[RUNNING] Running osrt-pkglistgen"
-                    /usr/bin/osrt-pkglistgen -A ${API_URL} --debug update_and_solve -p ${PROJECT} -s target --custom-cache-tag product --force >> ${LOG_DIR}/pkglistgen.log 2>&1
-                    exit $?
+                logger "[RUNNING] osrt-pkglistgen: 000product"
+                timeout 3h /usr/bin/osrt-pkglistgen -A ${API_URL} --debug update_and_solve -p ${PROJECT} -s target --custom-cache-tag product --force >> ${LOG_DIR}/pkglistgen.log 2>&1
+                if [ $? -eq 124 ]; then
+                    logger "[TIMEOUT] osrt-pkglistgen: 000product"
                 fi
+                logger "[INFO] Exit code: $?"
+                break
                 ;;
             3)
                 # Continue polling repository results: Repository is still building
@@ -69,9 +76,10 @@ if [ $? -eq 3 ]; then
                 ;;
             *)
                 # Stop polling repository results: Failed polling results
-                exit 1
+                break
                 ;;
         esac
     done
 fi
-logger "[FINISH] Finish osrt-pkglistgen@${PROJECT}.service"
+
+logger "[FINISH] osrt-pkglistgen@${PROJECT}.service"
