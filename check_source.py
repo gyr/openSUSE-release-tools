@@ -484,7 +484,14 @@ class CheckSource(ReviewBot.ReviewBot):
                 if subprocess.run(["cmp", "-s", os.path.join(old, changes), os.path.join(directory, changes)]).returncode:
                     changes_updated = True
 
-        if not changes_updated:
+        new_package = False
+        if self.platform_type == "GITEA":
+            # On Gitea new package submission is an empty PR with no commits
+            if self.request.actions[0].src_rev == self.request.actions[0].tgt_rev:
+                new_package = True
+                self.logger.info("Empty PR; skipping changes_updated check")
+
+        if not changes_updated and not new_package:
             self.review_messages['declined'] = "No changelog. Please use 'osc vc' to update the changes file(s)."
             return False
 
