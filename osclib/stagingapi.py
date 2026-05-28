@@ -839,6 +839,9 @@ class StagingAPI(object):
 
     def project_status_build_percent(self, status):
         final, tobuild = self.project_status_build_sum(status)
+        if (final + tobuild) == 0:
+            return None
+
         return final / float(final + tobuild) * 100
 
     def project_status_build_sum(self, status):
