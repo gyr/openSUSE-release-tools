@@ -1,6 +1,6 @@
 format_version: 3
 pipelines:
-  Dashboard.Factory:
+  Dashboard.ftbfs:
     group: openSUSE.Checkers
     lock_behavior: unlockWhenFinished
     environment_variables:
