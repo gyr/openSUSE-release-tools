@@ -11,9 +11,9 @@ from lxml import etree as ET
 from collections import namedtuple
 import osc.core
 
-USER_AGENT = "git-openqa-maintenance (https://github.com/openSUSE/openSUSE-release-tools"
 dry_run = False
 openqa_dry_run = False
+USER_AGENT = "git-openqa-maintenance (https://github.com/openSUSE/openSUSE-release-tools)"
 
 log = logging.getLogger(sys.argv[0] if __name__ == "__main__" else __name__)
 log.setLevel(logging.DEBUG)
@@ -86,13 +86,28 @@ def process_project(args):
 
 
 def get_open_prs_for_project_branch(project, branch):
-    pull_requests_url = GITEA_HOST + f"/api/v1/repos/{project}/pulls?state=open&base_branch={branch}"
+    limit = 50
+    page = 1
+    pull_requests = []
 
-    try:
-        pull_requests = request_get(pull_requests_url)
-    except requests.exceptions.HTTPError as e:
-        log.error(f"Project '{project}' doesn't exist: {e}")
-        return []
+    while True:
+        pull_requests_url = GITEA_HOST + f"/api/v1/repos/{project}/pulls?state=open&base_branch={branch}&limit={limit}&page={page}"
+
+        try:
+            request = request_get(pull_requests_url)
+        except requests.exceptions.HTTPError as e:
+            log.error(f"Project '{project}' doesn't exist: {e}")
+            return []
+
+        if not request:
+            break
+
+        pull_requests.extend(request)
+
+        if len(request) < limit:
+            break
+
+        page += 1
 
     if not pull_requests:
         log.warning(f"No pull requests found for '{project}' on'{branch}'")
@@ -443,15 +458,24 @@ def gitea_get_review(project, pr_id, review_id):
 
 def get_events_by_timeline(project, pr_id):
     log.debug("============== get_events_by_timeline")
-    url = GITEA_HOST + f"/api/v1/repos/{project}/issues/{pr_id}/timeline"
-    request = request_get(url)
+    limit = 50
+    page = 1
+    timeline = []
 
-    # if request.status_code == 404:
-    #     self.logger.error(f"'{self}' does not have a timeline")
-    #     # this should throw an exception
-    #     return
+    while True:
+        url = GITEA_HOST + f"/api/v1/repos/{project}/issues/{pr_id}/timeline?limit={limit}&page={page}"
+        request = request_get(url)
 
-    timeline = request
+        if not request:
+            break
+
+        timeline.extend(request)
+
+        if len(request) < limit:
+            break
+
+        page += 1
+
     timeline.reverse()
 
     events = {}
