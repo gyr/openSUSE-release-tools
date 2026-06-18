@@ -78,11 +78,28 @@ FACTORY_PROJECTS = [
 
 LEAP_PROJECTS = [
     {
-        'name': 'openSUSE:Leap:15.6:Images',
-        'nick': 'Leap:15.6:Images',
-        'openqa_group': 'openSUSE Leap 15.6 Images',
-        'openqa_version': '15.6',
-        'openqa_groupid': 117,
+        'name': 'openSUSE:Leap:16.0:Products',
+        'nick': 'Leap 16.0',
+        'download_url': 'https://download.opensuse.org/distribution/leap/16.0/',
+        'openqa_group': 'openSUSE Leap 16.0',
+        'openqa_version': '16.0',
+        'openqa_groupid': 129,
+    },
+    {
+        'name': 'openSUSE:Leap:16.0:Images',
+        'nick': 'Leap 16.0 Images',
+        'download_url': 'https://download.opensuse.org/distribution/leap/16.0/appliances',
+        'openqa_group': 'openSUSE Leap 16.0 Images',
+        'openqa_version': '16.0',
+        'openqa_groupid': 126,
+    },
+    {
+        'name': 'openSUSE:Leap:16.1:Products',
+        'nick': 'Leap 16.1',
+        'download_url': 'https://download.opensuse.org/distribution/leap/16.1/',
+        'openqa_group': 'openSUSE Leap 16.1',
+        'openqa_version': '16.1',
+        'openqa_groupid': 139,
     },
 ]
 
