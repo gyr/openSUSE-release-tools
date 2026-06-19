@@ -145,15 +145,9 @@
           <tr>
             <th>Part</th>
             <th>standard</th>
-            {% if is_leap %}
-            <th>ports</th>
-            <th>step</th>
-            {% endif %}
             <th>product</th>
             <th>images</th>
-            {% if not is_leap %}
             <th>containerfile</th>
-            {% endif %}
             <th>source</th>
             <th>testing</th>
             <th>published</th>
@@ -167,15 +161,9 @@
               <a class="project-link text-decoration-none" href="https://build.opensuse.org/project/show/{{ project.name }}">{{ project.nick }}</a>
             </td>
             <td data-label="Standard">{{ repository_progress(project, 'standard') }}</td>
-            {% if is_leap %}
-            <td data-label="Ports">{{ repository_progress(project, 'ports') }}</td>
-            <td data-label="Step">{{ repository_progress(project, 'step') }}</td>
-            {% endif %}
             <td data-label="Product">{{ repository_progress(project, 'product') }}</td>
             <td data-label="Images">{{ repository_progress(project, 'images') }}</td>
-            {% if not is_leap %}
             <td data-label="Containerfile">{{ repository_progress(project, 'containerfile') }}</td>
-            {% endif %}
             <td data-label="Source">
             {% if project.ttm_version %}
               <a class="text-decoration-none fw-semibold text-primary" href="https://build.opensuse.org/package/show/{{ project.name }}/000product">{{ project.ttm_version }}</a>
